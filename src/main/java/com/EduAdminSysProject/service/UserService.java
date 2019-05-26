@@ -11,4 +11,6 @@ public interface UserService {
     void validateOldPassword(String sid, String encryptPassword) throws BusinessException;
 
     void register(UserModel userModel) throws BusinessException;
+
+    void changePassword(UserModel userModel) throws BusinessException;
 }

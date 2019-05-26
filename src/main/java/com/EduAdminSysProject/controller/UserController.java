@@ -10,6 +10,7 @@ import org.apache.catalina.User;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -35,7 +36,7 @@ public class UserController extends BaseController {
         UserVO userVO = convertFromModel(userModel);
         return CommonReturnType.create(userVO);
     }
-
+//http://127.0.0.1:8090/user/login?sid=11611803&password=lklaejflae
     @RequestMapping(value = "/login"/*, method = {RequestMethod.POST}, consumes = {CONTNET_TYPE_FORMED}*/)
     @ResponseBody
     public CommonReturnType logIn(@RequestParam(name = "sid") String sid,
@@ -50,25 +51,26 @@ public class UserController extends BaseController {
 
         return CommonReturnType.create(null);
     }
-
+//http://127.0.0.1:8090/user/cgpass?oldpassword=lklaejflae&newpassword=654321
     @RequestMapping(value = "/cgpass"/*, method = {RequestMethod.POST}, consumes = {CONTNET_TYPE_FORMED}*/)
     @ResponseBody
+    @Transactional
     public CommonReturnType changePassword(@RequestParam(name = "oldpassword") String oldpassword,
                                            @RequestParam(name = "newpassword") String newpassword) throws BusinessException {
-//        if (oldpassword == null || newpassword == null || oldpassword.isEmpty() || newpassword.isEmpty()) {
-//            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
-//        }
-//        UserModel userModel = (UserModel)this.httpServletRequest.getSession().getAttribute("LOGIN");
-//
-//        userService.validateOldPassword(oldpassword, userModel.getEncryptPassword());
-//
-//        userModel.setEncryptPassword(newpassword);
+        if (oldpassword == null || newpassword == null || oldpassword.isEmpty() || newpassword.isEmpty()) {
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,"password is empty");
+        }
+        UserModel userModel = (UserModel)this.httpServletRequest.getSession().getAttribute("LOGIN");
+
+        userService.validateOldPassword(oldpassword, userModel.getEncryptPassword());
+
+        userModel.setEncryptPassword(newpassword);
 ////        this.httpServletRequest.getSession().setAttribute("IS_LOGIN", true);
 //        this.httpServletRequest.getSession().setAttribute("LOGIN", userModel);
-//
+        userService.changePassword(userModel);
         return CommonReturnType.create(null);
     }
-
+//http://127.0.0.1:8090/user/adduser?sid=11611804&password=123456&phonenumber=12345678987&name=peng&gender=1&role=1
     @RequestMapping(value = "/adduser"/*, method = {RequestMethod.POST}, consumes = {CONTNET_TYPE_FORMED}*/)
     @ResponseBody
     public CommonReturnType addUser(@RequestParam(name = "sid") String sid,
@@ -77,6 +79,7 @@ public class UserController extends BaseController {
                                     @RequestParam(name = "phonenumber") String phonenumber,
                                     @RequestParam(name = "role") Integer role,
                                     @RequestParam(name = "gender") Integer gender) throws BusinessException {
+        //验证是否有权限
 //        if (((UserModel) this.httpServletRequest.getSession().getAttribute("LOGIN")).getRole() != 0) {
 //            throw new BusinessException(EmBusinessError.USER_PRIVILEGE_ERROR, "ONLY ADMIN can add user");
 //        }

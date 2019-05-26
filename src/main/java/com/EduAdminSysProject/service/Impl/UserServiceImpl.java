@@ -53,12 +53,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void validateOldPassword(String inputPassword, String oldPassword) throws BusinessException {
-        if (StringUtils.isEmpty(inputPassword)) {
-            throw new BusinessException(EmBusinessError.USER_OLDPASS_WRONG);
-        }
-
         if (!StringUtils.equals(oldPassword, inputPassword)) {
-            throw new BusinessException(EmBusinessError.USER_OLDPASS_WRONG);
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "old password is wrong");
         }
         return;
     }
@@ -86,6 +82,19 @@ public class UserServiceImpl implements UserService {
 
         return;
     }
+
+    @Override
+    public void changePassword(UserModel userModel) throws BusinessException {
+        if (userModel == null) {
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
+        }
+
+        UserpasswordDO userpasswordDO = convertPasswordFromModel(userModel);
+        userpasswordDOMapper.updateByPrimaryKeySelective(userpasswordDO);
+
+        return;
+    }
+
     private UserDO convertFromModel(UserModel userModel) {
         if (userModel == null) {
             return null;
@@ -95,9 +104,9 @@ public class UserServiceImpl implements UserService {
         return userDO;
     }
 
-    private UserpasswordDO convertPasswordFromModel(UserModel userModel) {
+    private UserpasswordDO convertPasswordFromModel(UserModel userModel) throws BusinessException {
         if (userModel == null) {
-            return null;
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "course model is empty");
         }
         UserpasswordDO userPasswordDO = new UserpasswordDO();
         userPasswordDO.setEncryptpassword(userModel.getEncryptPassword());
