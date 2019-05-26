@@ -11,6 +11,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CourseServiceImpl implements CourseService {
@@ -30,6 +32,25 @@ public class CourseServiceImpl implements CourseService {
         CourseDO courseDO = convertFromModel(courseModel);
         courseDOMapper.insertSelective(courseDO);
         return;
+    }
+
+    @Override
+    public List<CourseModel> getAllCourse() {
+        List<CourseDO> courseDOList = courseDOMapper.selectAllCourses();
+        List<CourseModel> courseModelList = courseDOList.stream().map(courseDO ->{
+            CourseModel courseModel = convertToModel(courseDO);
+            return courseModel;
+        }).collect(Collectors.toList());
+        return courseModelList;
+    }
+
+    private CourseModel convertToModel(CourseDO courseDO) {
+        if (courseDO == null) {
+            return null;
+        }
+        CourseModel courseModel = new CourseModel();
+        BeanUtils.copyProperties(courseDO, courseModel);
+        return courseModel;
     }
 
     private CourseDO convertFromModel(CourseModel courseModel) throws BusinessException {
