@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @Controller("grade")
 @RequestMapping("/grade")
@@ -30,6 +31,8 @@ public class GradeController {
     @ResponseBody
     public CommonReturnType selectCourse(@RequestParam(name = "sid") String sid,
                                          @RequestParam(name = "cid") String cid) throws BusinessException {
+//        UserModel userModel = (UserModel)this.httpServletRequest.getSession().getAttribute("LOGIN");
+
         if (StringUtils.isEmpty(sid) || StringUtils.isEmpty(cid)) {
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
         }
@@ -40,5 +43,16 @@ public class GradeController {
         gradeService.selectCourse(gradeModel);
         return CommonReturnType.create(null);
 
+    }
+//http://127.0.0.1:8090/grade/getselected?sid=11611803
+    @RequestMapping("/getselected")
+    @ResponseBody
+    public CommonReturnType getAllSelectedCourse(@RequestParam(name = "sid") String sid) throws BusinessException {
+        if (StringUtils.isEmpty(sid)) {
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
+        }
+        List<GradeModel> gradeModelList = gradeService.getSelectedCourse(sid);
+
+        return CommonReturnType.create(gradeModelList);
     }
 }
