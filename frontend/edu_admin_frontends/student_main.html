@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+		<meta name="description" content="">
+		<meta name="author" content="">
+
+		<title>Student page</title>
+
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="signin.css" />
+		<script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"></script>
+
+
+	</head>
+
+	<body>
+
+		<div class="container form-signin">
+			<h1 class="form-signin-heading">You are student</h1>
+			<p><button type="button" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#changePasswordModal">Change
+					password</button></p>
+			<p><button type="button" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#getAllCourseModal" id="getAllCourseBtn">Get
+					all
+					avaliable courses</button></p>
+			<p><button type="button" class="btn btn-lg btn-danger" id="stuLogout">Log out</button></p>
+		</div>
+
+
+		<div class="modal fade" id="getAllCourseModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">
+							&times;
+						</button>
+						<h4 class="modal-title" id="getAllCourseLable">
+							Get all courses
+						</h4>
+					</div>
+					<div class="modal-body">
+
+						<table class="table table-striped ">
+							<tr>
+								<th>Course ID</th>
+								<th>Description</th>
+							</tr>
+							<tbody id="allCourseTable_stu" style="display: none;">
+								<tr>
+								</tr>
+							</tbody>
+						</table>
+						<hr />
+						<table class="table table-striped">
+							<tr>
+								<th>Course ID</th>
+								<th>Student ID</th>
+								<th>Grade</th>
+							</tr>
+							<tbody id="allSelectedCourseTable_stu" style="display: none;">
+								<tr>
+								</tr>
+							</tbody>
+						</table>
+						<hr />
+						<div class="form-group">
+							<form class="form-group" name="getAllCourseForm" id="getAllCourseForm">
+								<div class="form-group">
+									<label for="selectCourse">Select course ID</label>
+									<input type="text" class="form-control" name="selectCourse" id="selectCourse" />
+								</div>
+							</form>
+						</div>
+					</div>
+
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" data-dismiss="modal" id="getAllCourseSubmit">Submit</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal -->
+		</div>
+
+		<div class="modal fade" id="changePasswordModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+		 aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">
+							&times;
+						</button>
+						<h4 class="modal-title" id="changePasswordLable">
+							Change Password
+						</h4>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+							<form class="form-group" name="changePasswordForm" id="changePasswordForm">
+
+								<div class="form-group">
+									<label for="oldPassword">Old password</label>
+									<input type="text" class="form-control" name="oldPassword" id="oldPassword" />
+								</div>
+
+								<div class="form-group">
+									<label for="newPassword">New password</label>
+									<input type="text" class="form-control" name="newPassword" id="newPassword" />
+								</div>
+							</form>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" data-dismiss="modal" id="changePasswordSubmit">Submit</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal -->
+		</div>
+
+	</body>
+	<script>
+		jQuery(document).ready(function() {
+			//get course submit logic
+			$("#getAllCourseBtn").on("click", function() {
+				$.ajax({
+					type: "POST",
+					contentType: "application/x-www-form-urlencoded",
+					url: "http://localhost:8090/course/getallcourse",
+					data: {},
+					xhrFields: {
+						withCredentials: true
+					},
+					async: false,
+					success: function(data) {
+						if (data.status == "success") {
+							// insert data
+							var allCourseTable_stu = document.getElementById("allCourseTable_stu");
+							allCourseTable_stu.innerHTML = "<tr></tr>";
+							var rowCount = allCourseTable_stu.rows.length;
+							var colCount = allCourseTable_stu.rows[0].cells.length;
+							allCourseTable_stu.style.display = ""; //	display	the	tbody
+							var courseList = data.data;
+							for (var i = 0; i < courseList.length; i++) {
+								let newRow = allCourseTable_stu.insertRow(rowCount++);
+								newRow.insertCell(0).innerHTML = courseList[i].cid;
+								newRow.insertCell(1).innerHTML = courseList[i].description;
+							}
+
+						} else {
+							alert("fail");
+						}
+					},
+					error: function(data) {
+						alert("fail2");
+						return false;
+					}
+				});
+
+				$.ajax({
+					type: "POST",
+					contentType: "application/x-www-form-urlencoded",
+					url: "http://localhost:8090/grade/getselected",
+					data: {},
+					xhrFields: {
+						withCredentials: true
+					},
+					async: false,
+					success: function(data) {
+						if (data.status == "success") {
+							// insert data
+							var allSelectedCourseTable_stu = document.getElementById("allSelectedCourseTable_stu");
+							allSelectedCourseTable_stu.innerHTML = "<tr></tr>";
+							var rowCount = allSelectedCourseTable_stu.rows.length;
+							var colCount = allSelectedCourseTable_stu.rows[0].cells.length;
+							allSelectedCourseTable_stu.style.display = ""; //	display	the	tbody
+							var courseList = data.data;
+							for (var i = 0; i < courseList.length; i++) {
+								let newRow = allSelectedCourseTable_stu.insertRow(rowCount++);
+								newRow.insertCell(0).innerHTML = courseList[i].cid;
+								newRow.insertCell(1).innerHTML = courseList[i].sid;
+								newRow.insertCell(2).innerHTML = courseList[i].grade;
+							}
+						} else {
+							alert("fail");
+						}
+					},
+					error: function(data) {
+						alert("fail2");
+						return false;
+					}
+				});
+			});
+			//change password submit logic
+			$("#changePasswordSubmit").on("click", function() {
+				var oldpassword = $("#oldPassword").val()
+				var newpassword = $("#newPassword").val()
+				$.ajax({
+					type: "POST",
+					contentType: "application/x-www-form-urlencoded",
+					url: "http://localhost:8090/user/cgpass",
+					data: {
+						"oldpassword": oldpassword,
+						"newpassword": newpassword,
+					},
+					xhrFields: {
+						withCredentials: true
+					},
+					async: false,
+					success: function(data) {
+						if (data.status == "success") {
+							alert("success");
+						} else {
+							alert("fail");
+						}
+						return false;
+					},
+					error: function(data) {
+						alert("fail2");
+						return false;
+					}
+				});
+			});
+
+			$("#stuLogout").on("click", function() {
+				$.ajax({
+					type: "POST",
+					contentType: "application/x-www-form-urlencoded",
+					url: "http://localhost:8090/user/logout",
+					data: {},
+					xhrFields: {
+						withCredentials: true
+					},
+					async: false,
+					success: function(data) {
+						if (data.status == "success") {
+							window.location.href = "login.html";
+						} else {
+							alert("fail");
+						}
+						return false;
+					},
+					error: function(data) {
+						alert("fail2");
+						return false;
+					}
+				});
+				return false;
+			});
+
+			$("#getAllCourseSubmit").on("click", function(){
+				var cid = $("#selectCourse").val();
+				$.ajax({
+					type: "POST",
+					contentType: "application/x-www-form-urlencoded",
+					url: "http://localhost:8090/grade/selectcourse",
+					data: {
+						"cid" : cid,
+					},
+					xhrFields: {
+						withCredentials: true
+					},
+					async: false,
+					success: function(data) {
+						if (data.status == "success") {
+							alert("success")
+						} else {
+							alert("fail");
+						}
+						return false;
+					},
+					error: function(data) {
+						alert("fail2");
+						return false;
+					}
+				});
+			})
+			return false
+		});
+	</script>
+</html>
