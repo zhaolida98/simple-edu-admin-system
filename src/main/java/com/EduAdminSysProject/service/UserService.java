@@ -13,4 +13,5 @@ public interface UserService {
     void register(UserModel userModel) throws BusinessException;
 
     void changePassword(UserModel userModel) throws BusinessException;
+
 }
