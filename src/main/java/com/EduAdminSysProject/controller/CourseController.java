@@ -30,13 +30,23 @@ public class CourseController extends BaseController {
     @Resource
     private HttpServletRequest httpServletRequest;
 
-    //127.0.0.1:8090/course/addcourse?cid=CS101&description=JAVA1
+    //127.0.0.1:8090/course/addcourse?cid=CS103&description=JAVA1
     @RequestMapping("/addcourse")
     @ResponseBody
     public CommonReturnType addCourse(@RequestParam(name = "cid") String cid,
                                       @RequestParam(name = "description") String description) throws BusinessException {
+        //whether null
         if (StringUtils.isEmpty(cid) || StringUtils.isEmpty(description)) {
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "cid or description empty");
+        }
+        //whether login
+        Boolean bool = (Boolean) this.httpServletRequest.getSession().getAttribute("IS_LOGIN");
+        if (bool == null || !bool) {
+            throw new BusinessException(EmBusinessError.USER_LOGIN_FAIL, "is not login");
+        }
+        //whether privileged
+        if (((UserModel) this.httpServletRequest.getSession().getAttribute("LOGIN")).getRole() != 0) {
+            throw new BusinessException(EmBusinessError.USER_PRIVILEGE_ERROR, "only ADMIN can add user");
         }
         CourseModel courseModel = new CourseModel();
         courseModel.setCid(cid);
@@ -49,14 +59,12 @@ public class CourseController extends BaseController {
     @RequestMapping("/getallcourse")
     @ResponseBody
     public CommonReturnType getAllCourse() throws BusinessException {
-//        UserModel inSessionUserModel = (UserModel) this.httpServletRequest.getSession().getAttribute("LOGIN");
-//        if (inSessionUserModel == null) {
-//            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "user login error");
-//        }
+        //whether login
+        Boolean bool = (Boolean) this.httpServletRequest.getSession().getAttribute("IS_LOGIN");
+        if (bool == null || !bool) {
+            throw new BusinessException(EmBusinessError.USER_LOGIN_FAIL, "is not login");
+        }
         List<CourseModel> courseModelList = courseService.getAllCourse();
-//        List<CourseVO> courseVOList = courseModelList.stream().map(courseModel -> {
-//            return convertToVO(courseModel);
-//        }).collect...
         return CommonReturnType.create(courseModelList);
     }
 }

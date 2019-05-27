@@ -9,7 +9,6 @@ import com.EduAdminSysProject.error.EmBusinessError;
 import com.EduAdminSysProject.service.UserService;
 import com.EduAdminSysProject.service.model.UserModel;
 import com.alibaba.druid.util.StringUtils;
-import org.apache.catalina.User;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

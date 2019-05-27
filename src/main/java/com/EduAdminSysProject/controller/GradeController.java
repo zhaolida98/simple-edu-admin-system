@@ -5,6 +5,7 @@ import com.EduAdminSysProject.error.EmBusinessError;
 import com.EduAdminSysProject.response.CommonReturnType;
 import com.EduAdminSysProject.service.GradeService;
 import com.EduAdminSysProject.service.model.GradeModel;
+import com.EduAdminSysProject.service.model.UserModel;
 import com.alibaba.druid.util.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -29,29 +30,50 @@ public class GradeController {
 //    http://127.0.0.1:8090/grade/selectcourse?sid=11611803&cid=CS101
     @RequestMapping("/selectcourse")
     @ResponseBody
-    public CommonReturnType selectCourse(@RequestParam(name = "sid") String sid,
-                                         @RequestParam(name = "cid") String cid) throws BusinessException {
-//        UserModel userModel = (UserModel)this.httpServletRequest.getSession().getAttribute("LOGIN");
-
-        if (StringUtils.isEmpty(sid) || StringUtils.isEmpty(cid)) {
+    public CommonReturnType selectCourse(@RequestParam(name = "cid") String cid) throws BusinessException {
+        //whether empty
+        if (StringUtils.isEmpty(cid)) {
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
         }
+        //whether login
+        UserModel userModel = (UserModel)this.httpServletRequest.getSession().getAttribute("LOGIN");
+        Boolean bool = (Boolean) this.httpServletRequest.getSession().getAttribute("IS_LOGIN");
+        if (bool == null || !bool) {
+            throw new BusinessException(EmBusinessError.USER_LOGIN_FAIL, "is not login");
+        }
+        if (userModel == null) {
+            throw new BusinessException(EmBusinessError.USER_LOGIN_FAIL, "is not login");
+        }
+        //whether privileged
+        if (userModel.getRole() != 1) {
+            throw new BusinessException(EmBusinessError.USER_PRIVILEGE_ERROR, "only STUDENT can select course");
+        }
         GradeModel gradeModel = new GradeModel();
-        gradeModel.setSid(sid);
+        gradeModel.setSid(userModel.getSid());
         gradeModel.setCid(cid);
         gradeModel.setGrade(0);
         gradeService.selectCourse(gradeModel);
         return CommonReturnType.create(null);
 
     }
-//http://127.0.0.1:8090/grade/getselected?sid=11611803
+//http://127.0.0.1:8090/grade/getselected
     @RequestMapping("/getselected")
     @ResponseBody
-    public CommonReturnType getAllSelectedCourse(@RequestParam(name = "sid") String sid) throws BusinessException {
-        if (StringUtils.isEmpty(sid)) {
-            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
+    public CommonReturnType getAllSelectedCourse() throws BusinessException {
+        //whether login
+        UserModel userModel = (UserModel)this.httpServletRequest.getSession().getAttribute("LOGIN");
+        Boolean bool = (Boolean) this.httpServletRequest.getSession().getAttribute("IS_LOGIN");
+        if (bool == null || !bool) {
+            throw new BusinessException(EmBusinessError.USER_LOGIN_FAIL, "is not login");
         }
-        List<GradeModel> gradeModelList = gradeService.getSelectedCourse(sid);
+        if (userModel == null) {
+            throw new BusinessException(EmBusinessError.USER_LOGIN_FAIL, "is not login");
+        }
+        //whether privileged
+        if (userModel.getRole() != 1) {
+            throw new BusinessException(EmBusinessError.USER_PRIVILEGE_ERROR, "only STUDENT can select course");
+        }
+        List<GradeModel> gradeModelList = gradeService.getSelectedCourse(userModel.getSid());
 
         return CommonReturnType.create(gradeModelList);
     }

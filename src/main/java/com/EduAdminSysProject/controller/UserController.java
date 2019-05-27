@@ -32,11 +32,16 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/get_user")
     @ResponseBody
     public CommonReturnType getUser(@RequestParam(name = "sid") String sid) throws BusinessException {
+        //whether login
+        Boolean bool = (Boolean) this.httpServletRequest.getSession().getAttribute("IS_LOGIN");
+        if (bool == null || !bool) {
+            throw new BusinessException(EmBusinessError.USER_LOGIN_FAIL, "is not login");
+        }
         UserModel userModel = userService.getUserBySid(sid);
         UserVO userVO = convertFromModel(userModel);
         return CommonReturnType.create(userVO);
     }
-//http://127.0.0.1:8090/user/login?sid=11611803&password=lklaejflae
+//http://127.0.0.1:8090/user/login?sid=11611803&password=654321
     @RequestMapping(value = "/login"/*, method = {RequestMethod.POST}, consumes = {CONTNET_TYPE_FORMED}*/)
     @ResponseBody
     public CommonReturnType logIn(@RequestParam(name = "sid") String sid,
@@ -51,16 +56,41 @@ public class UserController extends BaseController {
 
         return CommonReturnType.create(null);
     }
-//http://127.0.0.1:8090/user/cgpass?oldpassword=lklaejflae&newpassword=654321
+
+    //http://127.0.0.1:8090/user/logout
+    @RequestMapping(value = "/logout"/*, method = {RequestMethod.POST}, consumes = {CONTNET_TYPE_FORMED}*/)
+    @ResponseBody
+    public CommonReturnType logOut() throws BusinessException {
+        Boolean bool = (Boolean) this.httpServletRequest.getSession().getAttribute("IS_LOGIN");
+        // whether login
+        if (bool == null || !bool) {
+            throw new BusinessException(EmBusinessError.USER_LOGIN_FAIL, "is not login");
+        }
+        this.httpServletRequest.getSession().setAttribute("IS_LOGIN", false);
+        this.httpServletRequest.getSession().setAttribute("LOGIN", null);
+
+        return CommonReturnType.create(null);
+    }
+//http://127.0.0.1:8090/user/cgpass?oldpassword=123456&newpassword=654321
     @RequestMapping(value = "/cgpass"/*, method = {RequestMethod.POST}, consumes = {CONTNET_TYPE_FORMED}*/)
     @ResponseBody
     @Transactional
     public CommonReturnType changePassword(@RequestParam(name = "oldpassword") String oldpassword,
                                            @RequestParam(name = "newpassword") String newpassword) throws BusinessException {
+        //whether empty
         if (oldpassword == null || newpassword == null || oldpassword.isEmpty() || newpassword.isEmpty()) {
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,"password is empty");
         }
         UserModel userModel = (UserModel)this.httpServletRequest.getSession().getAttribute("LOGIN");
+        Boolean bool = (Boolean) this.httpServletRequest.getSession().getAttribute("IS_LOGIN");
+        // whether login
+        if (userModel == null) {
+            throw new BusinessException(EmBusinessError.USER_LOGIN_FAIL, "null session model");
+        }
+        // whether login
+        if (bool == null || !bool) {
+            throw new BusinessException(EmBusinessError.USER_LOGIN_FAIL, "is not login");
+        }
 
         userService.validateOldPassword(oldpassword, userModel.getEncryptPassword());
 
@@ -79,10 +109,16 @@ public class UserController extends BaseController {
                                     @RequestParam(name = "phonenumber") String phonenumber,
                                     @RequestParam(name = "role") Integer role,
                                     @RequestParam(name = "gender") Integer gender) throws BusinessException {
-        //验证是否有权限
-//        if (((UserModel) this.httpServletRequest.getSession().getAttribute("LOGIN")).getRole() != 0) {
-//            throw new BusinessException(EmBusinessError.USER_PRIVILEGE_ERROR, "ONLY ADMIN can add user");
-//        }
+        //whether login
+        Boolean bool = (Boolean) this.httpServletRequest.getSession().getAttribute("IS_LOGIN");
+        if (bool == null || !bool) {
+            throw new BusinessException(EmBusinessError.USER_LOGIN_FAIL, "is not login");
+        }
+
+        //whether privileged
+        if (((UserModel) this.httpServletRequest.getSession().getAttribute("LOGIN")).getRole() != 0) {
+            throw new BusinessException(EmBusinessError.USER_PRIVILEGE_ERROR, "only ADMIN can add user");
+        }
         UserModel userModel = new UserModel();
         userModel.setSid(sid);
         userModel.setName(name);
@@ -104,6 +140,4 @@ public class UserController extends BaseController {
         BeanUtils.copyProperties(userModel, userVO);
         return userVO;
     }
-
-
 }
