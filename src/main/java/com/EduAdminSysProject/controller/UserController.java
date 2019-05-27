@@ -39,10 +39,11 @@ public class UserController extends BaseController {
         }
         UserModel userModel = userService.getUserBySid(sid);
         UserVO userVO = convertFromModel(userModel);
+        System.out.println("get user required from "+ sid);
         return CommonReturnType.create(userVO);
     }
 //http://127.0.0.1:8090/user/login?sid=11611803&password=654321
-    @RequestMapping(value = "/login"/*, method = {RequestMethod.POST}, consumes = {CONTNET_TYPE_FORMED}*/)
+    @RequestMapping(value = "/login", method = {RequestMethod.POST}, consumes = {CONTNET_TYPE_FORMED})
     @ResponseBody
     public CommonReturnType logIn(@RequestParam(name = "sid") String sid,
                                   @RequestParam(name = "password") String password) throws BusinessException {
@@ -53,12 +54,12 @@ public class UserController extends BaseController {
 
         this.httpServletRequest.getSession().setAttribute("IS_LOGIN", true);
         this.httpServletRequest.getSession().setAttribute("LOGIN", userModel);
-
-        return CommonReturnType.create(null);
+        System.out.println("login required from "+ sid);
+        return CommonReturnType.create(userModel);
     }
 
     //http://127.0.0.1:8090/user/logout
-    @RequestMapping(value = "/logout"/*, method = {RequestMethod.POST}, consumes = {CONTNET_TYPE_FORMED}*/)
+    @RequestMapping(value = "/logout", method = {RequestMethod.POST}, consumes = {CONTNET_TYPE_FORMED})
     @ResponseBody
     public CommonReturnType logOut() throws BusinessException {
         Boolean bool = (Boolean) this.httpServletRequest.getSession().getAttribute("IS_LOGIN");
@@ -68,11 +69,11 @@ public class UserController extends BaseController {
         }
         this.httpServletRequest.getSession().setAttribute("IS_LOGIN", false);
         this.httpServletRequest.getSession().setAttribute("LOGIN", null);
-
+        System.out.println("logout required ");
         return CommonReturnType.create(null);
     }
 //http://127.0.0.1:8090/user/cgpass?oldpassword=123456&newpassword=654321
-    @RequestMapping(value = "/cgpass"/*, method = {RequestMethod.POST}, consumes = {CONTNET_TYPE_FORMED}*/)
+    @RequestMapping(value = "/cgpass", method = {RequestMethod.POST}, consumes = {CONTNET_TYPE_FORMED})
     @ResponseBody
     @Transactional
     public CommonReturnType changePassword(@RequestParam(name = "oldpassword") String oldpassword,
@@ -98,17 +99,18 @@ public class UserController extends BaseController {
 ////        this.httpServletRequest.getSession().setAttribute("IS_LOGIN", true);
 //        this.httpServletRequest.getSession().setAttribute("LOGIN", userModel);
         userService.changePassword(userModel);
+        System.out.println("changePassword required from "+ userModel.getSid());
         return CommonReturnType.create(null);
     }
 //http://127.0.0.1:8090/user/adduser?sid=11611804&password=123456&phonenumber=12345678987&name=peng&gender=1&role=1
-    @RequestMapping(value = "/adduser"/*, method = {RequestMethod.POST}, consumes = {CONTNET_TYPE_FORMED}*/)
+    @RequestMapping(value = "/adduser", method = {RequestMethod.POST}, consumes = {CONTNET_TYPE_FORMED})
     @ResponseBody
     public CommonReturnType addUser(@RequestParam(name = "sid") String sid,
                                     @RequestParam(name = "name") String name,
                                     @RequestParam(name = "password") String password,
                                     @RequestParam(name = "phonenumber") String phonenumber,
-                                    @RequestParam(name = "role") Integer role,
-                                    @RequestParam(name = "gender") Integer gender) throws BusinessException {
+                                    @RequestParam(name = "role") String role,
+                                    @RequestParam(name = "gender") String gender) throws BusinessException {
         //whether login
         Boolean bool = (Boolean) this.httpServletRequest.getSession().getAttribute("IS_LOGIN");
         if (bool == null || !bool) {
@@ -124,10 +126,11 @@ public class UserController extends BaseController {
         userModel.setName(name);
         userModel.setEncryptPassword(password);
         userModel.setPhonenumber(phonenumber);
-        userModel.setRole(role);
-        userModel.setGender(gender);
+        userModel.setRole(Integer.parseInt(role));
+        userModel.setGender(Integer.parseInt(gender));
 
         userService.register(userModel);
+        System.out.println("addUser required " );
         return CommonReturnType.create(null);
     }
 

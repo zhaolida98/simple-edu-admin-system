@@ -8,10 +8,7 @@ import com.EduAdminSysProject.service.model.GradeModel;
 import com.EduAdminSysProject.service.model.UserModel;
 import com.alibaba.druid.util.StringUtils;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -20,7 +17,7 @@ import java.util.List;
 @Controller("grade")
 @RequestMapping("/grade")
 @CrossOrigin(origins = {"*"}, allowCredentials = "true")
-public class GradeController {
+public class GradeController extends BaseController{
 
     @Resource
     private GradeService gradeService;
@@ -28,7 +25,7 @@ public class GradeController {
     @Resource
     private HttpServletRequest httpServletRequest;
 //    http://127.0.0.1:8090/grade/selectcourse?sid=11611803&cid=CS101
-    @RequestMapping("/selectcourse")
+    @RequestMapping(value = "/selectcourse", method = {RequestMethod.POST}, consumes = {CONTNET_TYPE_FORMED})
     @ResponseBody
     public CommonReturnType selectCourse(@RequestParam(name = "cid") String cid) throws BusinessException {
         //whether empty
@@ -54,10 +51,9 @@ public class GradeController {
         gradeModel.setGrade(0);
         gradeService.selectCourse(gradeModel);
         return CommonReturnType.create(null);
-
     }
 //http://127.0.0.1:8090/grade/getselected
-    @RequestMapping("/getselected")
+    @RequestMapping(value = "/getselected", method = {RequestMethod.POST}, consumes = {CONTNET_TYPE_FORMED})
     @ResponseBody
     public CommonReturnType getAllSelectedCourse() throws BusinessException {
         //whether login

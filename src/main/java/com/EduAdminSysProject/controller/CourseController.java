@@ -1,7 +1,5 @@
 package com.EduAdminSysProject.controller;
 
-import com.EduAdminSysProject.controller.viewobject.CourseVO;
-import com.EduAdminSysProject.dataobject.CourseDO;
 import com.EduAdminSysProject.error.BusinessException;
 import com.EduAdminSysProject.error.EmBusinessError;
 import com.EduAdminSysProject.response.CommonReturnType;
@@ -10,10 +8,7 @@ import com.EduAdminSysProject.service.model.CourseModel;
 import com.EduAdminSysProject.service.model.UserModel;
 import com.alibaba.druid.util.StringUtils;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -31,7 +26,7 @@ public class CourseController extends BaseController {
     private HttpServletRequest httpServletRequest;
 
     //127.0.0.1:8090/course/addcourse?cid=CS103&description=JAVA1
-    @RequestMapping("/addcourse")
+    @RequestMapping(value = "/addcourse", method = {RequestMethod.POST}, consumes = {CONTNET_TYPE_FORMED})
     @ResponseBody
     public CommonReturnType addCourse(@RequestParam(name = "cid") String cid,
                                       @RequestParam(name = "description") String description) throws BusinessException {
@@ -52,11 +47,11 @@ public class CourseController extends BaseController {
         courseModel.setCid(cid);
         courseModel.setDescription(description);
         courseService.addCourse(courseModel);
-
+        System.out.println("addCourse required");
         return CommonReturnType.create(null);
     }
 //http://127.0.0.1:8090/course/getallcourse
-    @RequestMapping("/getallcourse")
+    @RequestMapping(value = "/getallcourse", method = {RequestMethod.POST}, consumes = {CONTNET_TYPE_FORMED})
     @ResponseBody
     public CommonReturnType getAllCourse() throws BusinessException {
         //whether login
@@ -65,6 +60,7 @@ public class CourseController extends BaseController {
             throw new BusinessException(EmBusinessError.USER_LOGIN_FAIL, "is not login");
         }
         List<CourseModel> courseModelList = courseService.getAllCourse();
+        System.out.println("get all course required");
         return CommonReturnType.create(courseModelList);
     }
 }
