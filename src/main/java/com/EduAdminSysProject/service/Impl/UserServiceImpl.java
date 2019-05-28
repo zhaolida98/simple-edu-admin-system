@@ -25,22 +25,22 @@ public class UserServiceImpl implements UserService {
     private UserpasswordDOMapper userpasswordDOMapper;
 
     @Override
-    public UserModel getUserBySid(String sId) {
-        UserDO userDO = userDOMapper.selectByPrimaryKey(sId);
+    public UserModel getUserBySid(String sid, String gid) {
+        UserDO userDO = userDOMapper.selectByPrimaryKey(sid, gid);
         if (userDO == null) {
             return null;
         }
-        UserpasswordDO userpasswordDO = userpasswordDOMapper.selectByPrimaryKey(userDO.getSid());
+        UserpasswordDO userpasswordDO = userpasswordDOMapper.selectByPrimaryKey(userDO.getSid(), userDO.getGid());
         return convertFromDataObject(userDO, userpasswordDO);
     }
 
     @Override
-    public UserModel validateLogin(String sid, String encryptPassword) throws BusinessException {
-        UserDO userDO = userDOMapper.selectByPrimaryKey(sid);
+    public UserModel validateLogin(String sid, String encryptPassword, String gid) throws BusinessException {
+        UserDO userDO = userDOMapper.selectByPrimaryKey(sid, gid);
         if (userDO == null) {
             throw new BusinessException(EmBusinessError.USER_LOGIN_FAIL);
         }
-        UserpasswordDO userpasswordDO = userpasswordDOMapper.selectByPrimaryKey(userDO.getSid());
+        UserpasswordDO userpasswordDO = userpasswordDOMapper.selectByPrimaryKey(userDO.getSid(), userDO.getGid());
         UserModel userModel = convertFromDataObject(userDO, userpasswordDO);
 
         if (!StringUtils.equals(encryptPassword, userModel.getEncryptPassword())) {
@@ -110,6 +110,7 @@ public class UserServiceImpl implements UserService {
         UserpasswordDO userPasswordDO = new UserpasswordDO();
         userPasswordDO.setEncryptpassword(userModel.getEncryptPassword());
         userPasswordDO.setSid(userModel.getSid());
+        userPasswordDO.setGid(userModel.getGid());
         return userPasswordDO;
     }
 

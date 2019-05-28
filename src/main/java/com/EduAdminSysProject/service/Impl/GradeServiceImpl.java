@@ -30,11 +30,11 @@ public class GradeServiceImpl implements GradeService {
     }
 
     @Override
-    public List<GradeModel> getSelectedCourse(String sid) throws BusinessException {
+    public List<GradeModel> getSelectedCourse(String sid, String gid) throws BusinessException {
         if (sid == null) {
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
         }
-        List<GradeDO> gradeDOList = gradeDOMapper.selectAllChosenCourse(sid);
+        List<GradeDO> gradeDOList = gradeDOMapper.selectAllChosenCourse(sid, gid);
         List<GradeModel> gradeModelList = gradeDOList.stream().map(gradeDO -> {
             GradeModel gradeModel = converToModel(gradeDO);
             return gradeModel;

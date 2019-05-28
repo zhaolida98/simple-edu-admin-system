@@ -8,5 +8,5 @@ import java.util.List;
 public interface GradeService {
     void selectCourse(GradeModel gradeModel) throws BusinessException;
 
-    List<GradeModel> getSelectedCourse(String sid) throws BusinessException;
+    List<GradeModel> getSelectedCourse(String sid, String gid) throws BusinessException;
 }

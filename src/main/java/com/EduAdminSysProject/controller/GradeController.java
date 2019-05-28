@@ -49,6 +49,7 @@ public class GradeController extends BaseController{
         gradeModel.setSid(userModel.getSid());
         gradeModel.setCid(cid);
         gradeModel.setGrade(0);
+        gradeModel.setGid(userModel.getGid());
         gradeService.selectCourse(gradeModel);
         return CommonReturnType.create(null);
     }
@@ -69,7 +70,7 @@ public class GradeController extends BaseController{
         if (userModel.getRole() != 1) {
             throw new BusinessException(EmBusinessError.USER_PRIVILEGE_ERROR, "only STUDENT can select course");
         }
-        List<GradeModel> gradeModelList = gradeService.getSelectedCourse(userModel.getSid());
+        List<GradeModel> gradeModelList = gradeService.getSelectedCourse(userModel.getSid(), userModel.getGid());
 
         return CommonReturnType.create(gradeModelList);
     }

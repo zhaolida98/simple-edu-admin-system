@@ -4,6 +4,15 @@ public class GradeModel {
     private String sid;
     private String cid;
     private Integer grade;
+    private String gid;
+
+    public String getGid() {
+        return gid;
+    }
+
+    public void setGid(String gid) {
+        this.gid = gid;
+    }
 
     public String getSid() {
         return sid;

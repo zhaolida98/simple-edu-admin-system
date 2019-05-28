@@ -6,8 +6,17 @@ public class UserModel {
     private String name;
     private Integer role;
     private Integer gender;
+    private String gid;
 
     private String encryptPassword;
+
+    public String getGid() {
+        return gid;
+    }
+
+    public void setGid(String gid) {
+        this.gid = gid;
+    }
 
     public String getSid() {
         return sid;

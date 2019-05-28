@@ -38,27 +38,31 @@ public class UserController extends BaseController {
     public CommonReturnType getUser(@RequestParam(name = "sid") String sid) throws BusinessException {
         //whether login
         Boolean bool = (Boolean) this.httpServletRequest.getSession().getAttribute("IS_LOGIN");
+        UserModel sessionUserModel = (UserModel) this.httpServletRequest.getSession().getAttribute("LOGIN");
+
         if (bool == null || !bool) {
             throw new BusinessException(EmBusinessError.USER_LOGIN_FAIL, "is not login");
         }
-        UserModel userModel = userService.getUserBySid(sid);
+        UserModel userModel = userService.getUserBySid(sid, sessionUserModel.getGid());
         UserVO userVO = convertFromModel(userModel);
-        System.out.println("get user required from "+ sid);
+        System.out.println("get user required from " + sid);
         return CommonReturnType.create(userVO);
     }
-//http://127.0.0.1:8090/user/login?sid=11611803&password=654321
+
+    //http://127.0.0.1:8090/user/login?sid=11611803&password=654321
     @RequestMapping(value = "/login", method = {RequestMethod.POST}, consumes = {CONTNET_TYPE_FORMED})
     @ResponseBody
     public CommonReturnType logIn(@RequestParam(name = "sid") String sid,
-                                  @RequestParam(name = "password") String password) throws BusinessException, UnsupportedEncodingException, NoSuchAlgorithmException {
+                                  @RequestParam(name = "password") String password,
+                                  @RequestParam(name = "gid") String gid) throws BusinessException, UnsupportedEncodingException, NoSuchAlgorithmException {
         if (sid == null || password == null || sid.isEmpty() || password.isEmpty()) {
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
         }
-        UserModel userModel = userService.validateLogin(sid, encodeByMD5(password));
+        UserModel userModel = userService.validateLogin(sid, encodeByMD5(password), gid);
 
         this.httpServletRequest.getSession().setAttribute("IS_LOGIN", true);
         this.httpServletRequest.getSession().setAttribute("LOGIN", userModel);
-        System.out.println("login required from "+ sid);
+        System.out.println("login required from " + sid);
         return CommonReturnType.create(userModel);
     }
 
@@ -76,7 +80,8 @@ public class UserController extends BaseController {
         System.out.println("logout required ");
         return CommonReturnType.create(null);
     }
-//http://127.0.0.1:8090/user/cgpass?oldpassword=123456&newpassword=654321
+
+    //http://127.0.0.1:8090/user/cgpass?oldpassword=123456&newpassword=654321
     @RequestMapping(value = "/cgpass", method = {RequestMethod.POST}, consumes = {CONTNET_TYPE_FORMED})
     @ResponseBody
     @Transactional
@@ -84,9 +89,9 @@ public class UserController extends BaseController {
                                            @RequestParam(name = "newpassword") String newpassword) throws BusinessException, UnsupportedEncodingException, NoSuchAlgorithmException {
         //whether empty
         if (oldpassword == null || newpassword == null || oldpassword.isEmpty() || newpassword.isEmpty()) {
-            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,"password is empty");
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "password is empty");
         }
-        UserModel userModel = (UserModel)this.httpServletRequest.getSession().getAttribute("LOGIN");
+        UserModel userModel = (UserModel) this.httpServletRequest.getSession().getAttribute("LOGIN");
         Boolean bool = (Boolean) this.httpServletRequest.getSession().getAttribute("IS_LOGIN");
         // whether login
         if (userModel == null) {
@@ -103,10 +108,11 @@ public class UserController extends BaseController {
 ////        this.httpServletRequest.getSession().setAttribute("IS_LOGIN", true);
 //        this.httpServletRequest.getSession().setAttribute("LOGIN", userModel);
         userService.changePassword(userModel);
-        System.out.println("changePassword required from "+ userModel.getSid());
+        System.out.println("changePassword required from " + userModel.getSid());
         return CommonReturnType.create(null);
     }
-//http://127.0.0.1:8090/user/adduser?sid=11611804&password=123456&phonenumber=12345678987&name=peng&gender=1&role=1
+
+    //http://127.0.0.1:8090/user/adduser?sid=11611804&password=123456&phonenumber=12345678987&name=peng&gender=1&role=1
     @RequestMapping(value = "/adduser", method = {RequestMethod.POST}, consumes = {CONTNET_TYPE_FORMED})
     @ResponseBody
     public CommonReturnType addUser(@RequestParam(name = "sid") String sid,
@@ -114,9 +120,11 @@ public class UserController extends BaseController {
                                     @RequestParam(name = "password") String password,
                                     @RequestParam(name = "phonenumber") String phonenumber,
                                     @RequestParam(name = "role") String role,
-                                    @RequestParam(name = "gender") String gender) throws BusinessException, UnsupportedEncodingException, NoSuchAlgorithmException {
+                                    @RequestParam(name = "gender") String gender
+                                    ) throws BusinessException, UnsupportedEncodingException, NoSuchAlgorithmException {
         //whether login
         Boolean bool = (Boolean) this.httpServletRequest.getSession().getAttribute("IS_LOGIN");
+        UserModel sessionUserModel = (UserModel) this.httpServletRequest.getSession().getAttribute("LOGIN");
         if (bool == null || !bool) {
             throw new BusinessException(EmBusinessError.USER_LOGIN_FAIL, "is not login");
         }
@@ -132,9 +140,10 @@ public class UserController extends BaseController {
         userModel.setPhonenumber(phonenumber);
         userModel.setRole(Integer.parseInt(role));
         userModel.setGender(Integer.parseInt(gender));
+        userModel.setGid(sessionUserModel.getGid());
 
         userService.register(userModel);
-        System.out.println("addUser required " );
+        System.out.println("addUser required ");
         return CommonReturnType.create(null);
     }
 
@@ -147,6 +156,7 @@ public class UserController extends BaseController {
         BeanUtils.copyProperties(userModel, userVO);
         return userVO;
     }
+
     private String encodeByMD5(String str) throws UnsupportedEncodingException, NoSuchAlgorithmException {
         MessageDigest md5 = MessageDigest.getInstance("MD5");
         BASE64Encoder base64Encoder = new BASE64Encoder();

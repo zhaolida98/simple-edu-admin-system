@@ -7,6 +7,7 @@ import com.EduAdminSysProject.service.CourseService;
 import com.EduAdminSysProject.service.model.CourseModel;
 import com.EduAdminSysProject.service.model.UserModel;
 import com.alibaba.druid.util.StringUtils;
+import org.apache.catalina.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,16 +37,18 @@ public class CourseController extends BaseController {
         }
         //whether login
         Boolean bool = (Boolean) this.httpServletRequest.getSession().getAttribute("IS_LOGIN");
+        UserModel userModel = (UserModel)this.httpServletRequest.getSession().getAttribute("LOGIN");
         if (bool == null || !bool) {
             throw new BusinessException(EmBusinessError.USER_LOGIN_FAIL, "is not login");
         }
         //whether privileged
-        if (((UserModel) this.httpServletRequest.getSession().getAttribute("LOGIN")).getRole() != 0) {
+        if (userModel.getRole() != 0) {
             throw new BusinessException(EmBusinessError.USER_PRIVILEGE_ERROR, "only ADMIN can add user");
         }
         CourseModel courseModel = new CourseModel();
         courseModel.setCid(cid);
         courseModel.setDescription(description);
+        courseModel.setGid(userModel.getGid());
         courseService.addCourse(courseModel);
         System.out.println("addCourse required");
         return CommonReturnType.create(null);
@@ -56,10 +59,11 @@ public class CourseController extends BaseController {
     public CommonReturnType getAllCourse() throws BusinessException {
         //whether login
         Boolean bool = (Boolean) this.httpServletRequest.getSession().getAttribute("IS_LOGIN");
+        UserModel userModel = (UserModel)this.httpServletRequest.getSession().getAttribute("LOGIN");
         if (bool == null || !bool) {
             throw new BusinessException(EmBusinessError.USER_LOGIN_FAIL, "is not login");
         }
-        List<CourseModel> courseModelList = courseService.getAllCourse();
+        List<CourseModel> courseModelList = courseService.getAllCourse(userModel.getGid());
         System.out.println("get all course required");
         return CommonReturnType.create(courseModelList);
     }

@@ -20,7 +20,7 @@ public class BaseController {
     @ResponseBody
     public Object handleException(HttpServletRequest request, Exception ex) {
         HashMap<String, Object> responseData = new HashMap<>();
-//        ex.printStackTrace();
+        ex.printStackTrace();
         if (ex instanceof BusinessException) {
             BusinessException businessException = (BusinessException) ex;
             responseData.put("errCode", businessException.getErrorCode());

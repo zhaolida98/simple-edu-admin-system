@@ -8,6 +8,6 @@ import java.util.List;
 public interface CourseService {
     void addCourse(CourseModel courseModel) throws BusinessException;
 
-    List<CourseModel> getAllCourse();
+    List<CourseModel> getAllCourse(String gid);
 
 }

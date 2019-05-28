@@ -26,8 +26,11 @@
 				<h2 class="form-signin-heading">Please log in</h2>
 				<label for="inputName" class="sr-only">School ID</label>
 				<input type="text" id="inputName" class="form-control" placeholder="school id" required autofocus>
+				<label for="inputGid" class="sr-only">Group ID</label>
+				<input type="text" id="inputGid" class="form-control" placeholder="gid" required>
 				<label for="inputPassword" class="sr-only">Password</label>
 				<input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+
 				<div class="checkbox">
 					<label>
 						<input type="checkbox" value="remember-me"> Remember me
@@ -54,6 +57,7 @@
 					url: "http://localhost:8090/user/login",
 					data: {
 						"sid": $("#inputName").val(),
+						"gid": $("#inputGid").val(),
 						"password": $("#inputPassword").val(),
 					},
 					xhrFields: {
@@ -72,7 +76,7 @@
 								alert("no such role");
 							}
 						} else {
-							alert("fail"+data.data.errCode+": "+data.data.errMsg);
+							alert("fail" + data.data.errCode + ": " + data.data.errMsg);
 						}
 						return false;
 					},

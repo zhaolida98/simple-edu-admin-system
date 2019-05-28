@@ -3,6 +3,15 @@ package com.EduAdminSysProject.service.model;
 public class CourseModel {
     private String cid;
     private String description;
+    private String gid;
+
+    public String getGid() {
+        return gid;
+    }
+
+    public void setGid(String gid) {
+        this.gid = gid;
+    }
 
     public String getCid() {
         return cid;

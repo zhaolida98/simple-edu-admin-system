@@ -35,8 +35,8 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public List<CourseModel> getAllCourse() {
-        List<CourseDO> courseDOList = courseDOMapper.selectAllCourses();
+    public List<CourseModel> getAllCourse(String gid) {
+        List<CourseDO> courseDOList = courseDOMapper.selectCourseByGid(gid);
         List<CourseModel> courseModelList = courseDOList.stream().map(courseDO ->{
             CourseModel courseModel = convertToModel(courseDO);
             return courseModel;
