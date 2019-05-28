@@ -72,12 +72,12 @@
 								alert("no such role");
 							}
 						} else {
-							alert("fail");
+							alert("fail"+data.data.errCode+": "+data.data.errMsg);
 						}
 						return false;
 					},
 					error: function(data) {
-						alert("fail2");
+						alert("server error");
 						return false;
 					}
 				});

@@ -229,11 +229,11 @@
 								newRow.insertCell(1).innerHTML = courseList[i].description;
 							}
 						} else {
-							alert("fail");
+							alert("fail"+data.data.errCode+": "+data.data.errMsg);
 						}
 					},
 					error: function(data) {
-						alert("fail2");
+						alert("server error");
 						return false;
 					}
 				});
@@ -249,7 +249,7 @@
 							alert("success");
 
 						} else {
-							alert("fail");
+							alert("fail"+data.data.errCode+": "+data.data.errMsg);
 						}
 					});
 			});
@@ -266,7 +266,7 @@
 							alert("success");
 
 						} else {
-							alert("fail");
+							alert("fail"+data.data.errCode+": "+data.data.errMsg);
 						}
 					});
 			});
@@ -291,7 +291,7 @@
 							alert("success");
 
 						} else {
-							alert("fail");
+							alert("fail"+data.data.errCode+": "+data.data.errMsg);
 						}
 					});
 			});
@@ -310,12 +310,12 @@
 						if (data.status == "success") {
 							window.location.href = "login.html";
 						} else {
-							alert("fail");
+							alert("fail"+data.data.errCode+": "+data.data.errMsg);
 						}
 						return false;
 					},
 					error: function(data) {
-						alert("fail2");
+						alert("server error");
 						return false;
 					}
 				});
