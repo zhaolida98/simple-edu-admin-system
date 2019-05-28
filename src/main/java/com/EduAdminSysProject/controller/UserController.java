@@ -12,10 +12,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import sun.misc.BASE64Encoder;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 
 @Controller("user")
@@ -46,11 +50,11 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/login", method = {RequestMethod.POST}, consumes = {CONTNET_TYPE_FORMED})
     @ResponseBody
     public CommonReturnType logIn(@RequestParam(name = "sid") String sid,
-                                  @RequestParam(name = "password") String password) throws BusinessException {
+                                  @RequestParam(name = "password") String password) throws BusinessException, UnsupportedEncodingException, NoSuchAlgorithmException {
         if (sid == null || password == null || sid.isEmpty() || password.isEmpty()) {
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
         }
-        UserModel userModel = userService.validateLogin(sid, password);
+        UserModel userModel = userService.validateLogin(sid, encodeByMD5(password));
 
         this.httpServletRequest.getSession().setAttribute("IS_LOGIN", true);
         this.httpServletRequest.getSession().setAttribute("LOGIN", userModel);
@@ -77,7 +81,7 @@ public class UserController extends BaseController {
     @ResponseBody
     @Transactional
     public CommonReturnType changePassword(@RequestParam(name = "oldpassword") String oldpassword,
-                                           @RequestParam(name = "newpassword") String newpassword) throws BusinessException {
+                                           @RequestParam(name = "newpassword") String newpassword) throws BusinessException, UnsupportedEncodingException, NoSuchAlgorithmException {
         //whether empty
         if (oldpassword == null || newpassword == null || oldpassword.isEmpty() || newpassword.isEmpty()) {
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,"password is empty");
@@ -93,9 +97,9 @@ public class UserController extends BaseController {
             throw new BusinessException(EmBusinessError.USER_LOGIN_FAIL, "is not login");
         }
 
-        userService.validateOldPassword(oldpassword, userModel.getEncryptPassword());
+        userService.validateOldPassword(encodeByMD5(oldpassword), userModel.getEncryptPassword());
 
-        userModel.setEncryptPassword(newpassword);
+        userModel.setEncryptPassword(encodeByMD5(newpassword));
 ////        this.httpServletRequest.getSession().setAttribute("IS_LOGIN", true);
 //        this.httpServletRequest.getSession().setAttribute("LOGIN", userModel);
         userService.changePassword(userModel);
@@ -110,7 +114,7 @@ public class UserController extends BaseController {
                                     @RequestParam(name = "password") String password,
                                     @RequestParam(name = "phonenumber") String phonenumber,
                                     @RequestParam(name = "role") String role,
-                                    @RequestParam(name = "gender") String gender) throws BusinessException {
+                                    @RequestParam(name = "gender") String gender) throws BusinessException, UnsupportedEncodingException, NoSuchAlgorithmException {
         //whether login
         Boolean bool = (Boolean) this.httpServletRequest.getSession().getAttribute("IS_LOGIN");
         if (bool == null || !bool) {
@@ -124,7 +128,7 @@ public class UserController extends BaseController {
         UserModel userModel = new UserModel();
         userModel.setSid(sid);
         userModel.setName(name);
-        userModel.setEncryptPassword(password);
+        userModel.setEncryptPassword(encodeByMD5(password));
         userModel.setPhonenumber(phonenumber);
         userModel.setRole(Integer.parseInt(role));
         userModel.setGender(Integer.parseInt(gender));
@@ -142,5 +146,11 @@ public class UserController extends BaseController {
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(userModel, userVO);
         return userVO;
+    }
+    private String encodeByMD5(String str) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+        MessageDigest md5 = MessageDigest.getInstance("MD5");
+        BASE64Encoder base64Encoder = new BASE64Encoder();
+        String newstr = base64Encoder.encode(md5.digest(str.getBytes("utf-8")));
+        return newstr;
     }
 }
