@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+		<meta name="description" content="">
+		<meta name="author" content="">
+
+		<title>Login page</title>
+
+		<link rel="stylesheet" type="text/css" href="signin.css" />
+		<link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+		<script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+		<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+
+	</head>
+
+	<body>
+
+		<div class="container">
+
+			<form class="form-signin">
+				<h2 class="form-signin-heading">Please log in</h2>
+				<label for="inputName" class="sr-only">School ID</label>
+				<input type="text" id="inputName" class="form-control" placeholder="school id" required autofocus>
+				<label for="inputGid" class="sr-only">Group ID</label>
+				<input type="text" id="inputGid" class="form-control" placeholder="gid" required>
+				<label for="inputPassword" class="sr-only">Password</label>
+				<input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+
+				<div class="checkbox">
+					<label>
+						<input type="checkbox" value="remember-me"> Remember me
+					</label>
+				</div>
+				<button class="btn btn-lg btn-primary btn-block" id="loginSubmit">Log in</button>
+			</form>
+
+		</div> <!-- /container -->
+	</body>
+	<script type="text/javascript">
+		jQuery(document).ready(function() {
+			// 			$.ajaxSetup({
+			// 				async:false,
+			// 				xhrFields:{withCredentials:true},
+			// 				contentType:"application/x-www-form-urlencoded",
+			// 			});
+			// 			//submit logic
+			$("#loginSubmit").on("click", function() {
+
+				$.ajax({
+					type: "POST",
+					contentType: "application/x-www-form-urlencoded",
+					url: "http://193.112.53.42:8090/user/login",
+					data: {
+						"sid": $("#inputName").val(),
+						"gid": $("#inputGid").val(),
+						"password": $("#inputPassword").val(),
+					},
+					xhrFields: {
+						withCredentials: true
+					},
+					async: false,
+					success: function(data) {
+						if (data.status == "success") {
+							// window.event.returnValue = false;
+							// alert("success");
+							if (data.data.role == "1") {
+								window.location.href = 'student_main.html';
+							} else if (data.data.role == "0") {
+								window.location.href = 'admin_main.html';
+							} else {
+								alert("no such role");
+							}
+						} else {
+							alert("fail" + data.data.errCode + ": " + data.data.errMsg);
+						}
+						return false;
+					},
+					error: function(data) {
+						alert("server error");
+						return false;
+					}
+				});
+				return false;
+			});
+
+
+
+		});
+	</script>
+</html>

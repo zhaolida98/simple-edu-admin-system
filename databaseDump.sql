@@ -1,3 +1,5 @@
+CREATE DATABASE  IF NOT EXISTS `myschema` /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci */;
+USE `myschema`;
 -- MySQL dump 10.13  Distrib 8.0.15, for Win64 (x86_64)
 --
 -- Host: localhost    Database: myschema
@@ -21,13 +23,13 @@
 
 DROP TABLE IF EXISTS `course_info`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
- SET character_set_client = utf8mb4 ;
+ SET character_set_client = utf8 ;
 CREATE TABLE `course_info` (
   `cId` varchar(10) NOT NULL,
+  `gId` varchar(10) NOT NULL,
   `description` varchar(128) NOT NULL DEFAULT '//',
-  PRIMARY KEY (`cId`),
-  UNIQUE KEY `c_id_UNIQUE` (`cId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  PRIMARY KEY (`cId`,`gId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -36,7 +38,7 @@ CREATE TABLE `course_info` (
 
 LOCK TABLES `course_info` WRITE;
 /*!40000 ALTER TABLE `course_info` DISABLE KEYS */;
-INSERT INTO `course_info` VALUES ('CS101','JAVA1'),('CS102','C++'),('CS103','PYTHON'),('CS104','GO');
+INSERT INTO `course_info` VALUES ('CS101','1','JAVA1'),('CS102','1','C++'),('CS103','1','PYTHON'),('CS104','1','GO'),('CS110','1','110'),('CS111','2','JAVA'),('CS119','1','Fine'),('CS316','1','Cloud Computing');
 /*!40000 ALTER TABLE `course_info` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -46,13 +48,14 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `grade`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
- SET character_set_client = utf8mb4 ;
+ SET character_set_client = utf8 ;
 CREATE TABLE `grade` (
   `sId` varchar(10) NOT NULL,
   `cId` varchar(10) NOT NULL,
+  `gId` varchar(10) NOT NULL,
   `grade` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`sId`,`cId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  PRIMARY KEY (`sId`,`cId`,`gId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -61,7 +64,7 @@ CREATE TABLE `grade` (
 
 LOCK TABLES `grade` WRITE;
 /*!40000 ALTER TABLE `grade` DISABLE KEYS */;
-INSERT INTO `grade` VALUES ('11611803','CS101',0),('11611803','CS102',0),('11611803','CS103',0),('11611815','CS103',0);
+INSERT INTO `grade` VALUES ('11611803','CS101','1',0),('11611803','CS102','1',0),('11611803','CS103','1',0),('11611815','CS101','1',0),('11611815','CS102','1',0),('11611815','CS103','1',0);
 /*!40000 ALTER TABLE `grade` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -71,18 +74,17 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `user_info`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
- SET character_set_client = utf8mb4 ;
+ SET character_set_client = utf8 ;
 CREATE TABLE `user_info` (
   `sId` varchar(10) NOT NULL,
+  `gId` varchar(10) NOT NULL,
   `name` varchar(45) NOT NULL,
   `phoneNumber` varchar(11) NOT NULL,
   `role` int(11) NOT NULL DEFAULT '-1',
   `gender` int(11) NOT NULL DEFAULT '-1',
-  PRIMARY KEY (`sId`),
-  UNIQUE KEY `school_id_UNIQUE` (`sId`),
-  UNIQUE KEY `phone_number_UNIQUE` (`phoneNumber`),
-  UNIQUE KEY `name_UNIQUE` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='//students and teacher''s information\n// role 1:student   0:teacher\n// gender 1:male   0:female';
+  PRIMARY KEY (`sId`,`gId`),
+  UNIQUE KEY `phone_number_UNIQUE` (`phoneNumber`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci COMMENT='//students and teacher''s information\n// role 1:student   0:teacher\n// gender 1:male   0:female';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -91,7 +93,7 @@ CREATE TABLE `user_info` (
 
 LOCK TABLES `user_info` WRITE;
 /*!40000 ALTER TABLE `user_info` DISABLE KEYS */;
-INSERT INTO `user_info` VALUES ('11611803','zhaolida','22222222222',1,1),('11711631','jijie','11111111111',0,0);
+INSERT INTO `user_info` VALUES ('11611803','1','zhaolida','22222222222',1,1),('11611804','1','Peter','13113111311',1,1),('11611815','1','wangshuxin','33333333333',1,1),('11711631','1','jijie','11111111111',0,0),('22622803','2','lidazhao','2121221121',0,0);
 /*!40000 ALTER TABLE `user_info` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -101,13 +103,13 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `user_password`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
- SET character_set_client = utf8mb4 ;
+ SET character_set_client = utf8 ;
 CREATE TABLE `user_password` (
   `sId` varchar(10) NOT NULL,
+  `gId` varchar(10) NOT NULL,
   `encryptPassword` varchar(128) NOT NULL,
-  PRIMARY KEY (`sId`),
-  UNIQUE KEY `sId_UNIQUE` (`sId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  PRIMARY KEY (`sId`,`gId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -116,7 +118,7 @@ CREATE TABLE `user_password` (
 
 LOCK TABLES `user_password` WRITE;
 /*!40000 ALTER TABLE `user_password` DISABLE KEYS */;
-INSERT INTO `user_password` VALUES ('11611803','4QrcOUm6Wau+VuBX8g+IPg=='),('11711631','4QrcOUm6Wau+VuBX8g+IPg==');
+INSERT INTO `user_password` VALUES ('11611803','1','4QrcOUm6Wau+VuBX8g+IPg=='),('11611804','1','4QrcOUm6Wau+VuBX8g+IPg=='),('11611815','1','wzNncBURtPYCDsYd7TUgWQ=='),('11711631','1','4QrcOUm6Wau+VuBX8g+IPg=='),('22622803','2','4QrcOUm6Wau+VuBX8g+IPg==');
 /*!40000 ALTER TABLE `user_password` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -137,4 +139,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-05-28 10:46:41
+-- Dump completed on 2019-05-29 11:05:39

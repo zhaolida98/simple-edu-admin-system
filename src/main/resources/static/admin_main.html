@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+		<meta name="description" content="">
+		<meta name="author" content="">
+
+		<title>Admin page</title>
+
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="signin.css" />
+		<script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"></script>
+		<link rel="import" href="student_main.html" id="page_stu" />
+
+
+	</head>
+
+	<body>
+
+		<div class="container form-signin">
+			<h1 class="form-signin-heading">You are Admin</h1>
+			<p><button type="button" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#adminChangePasswordModal">Change
+					password</button></p>
+			<p><button type="button" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#adminGetCourseModal" id="adminGetCourseBtn">Get
+					all available courses</button></p>
+			<p><button type="button" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#addUserModal">Add user</button></p>
+			<p><button type="button" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#addCoursesModal">Add
+					courses</button></p>
+			<p><button type="button" class="btn btn-lg btn-danger" id="admLogout">Log out</button></p>
+
+		</div> <!-- /container -->
+		<div class="modal fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">
+							&times;
+						</button>
+						<h4 class="modal-title" id="myModalLabel">
+							Adding user
+						</h4>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+							<form class="form-group" name="addUserForm" id="addUserForm">
+								<div class="form-group">
+									<label for="sid">sid</label>
+									<input type="text" class="form-control" name="sid" id="sid" />
+								</div>
+								
+								<div class="form-group">
+									<label for="name">name</label>
+									<input type="text" class="form-control" name="name" id="name" />
+								</div>
+								<div class="form-group">
+									<label for="phonenumber">phone number</label>
+									<input type="text" class="form-control" name="phonenumber" id="phonenumber" />
+								</div>
+
+								<div class="form-group">
+									<label for="#role">role</label>
+									<select id="role" class="form-control">
+										<option value="1">student</option>
+										<option value="0">admin</option>
+									</select>
+								</div>
+
+								<div class="form-group">
+									<label for="#gender">gender</label>
+									<select id="gender" class="form-control">
+										<option value="1">male</option>
+										<option value="0">female</option>
+									</select>
+								</div>
+								<div class="form-group">
+									<label for="password">password</label>
+									<input type="password" class="form-control" name="password" id="password" />
+								</div>
+							</form>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" data-dismiss="modal" id="addUserSubmit">Submit</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal -->
+		</div>
+
+		<div class="modal fade" id="addCoursesModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">
+							&times;
+						</button>
+						<h4 class="modal-title" id="myModalLabel">
+							Adding Courses
+						</h4>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+							<form class="form-group" name="addCourseForm">
+								<div class="form-group">
+									<label for="addCid">Course ID</label>
+									<input type="text" class="form-control" name="addCid" id="addCid" />
+								</div>
+								<div class="form-group">
+									<label for="addDescription">Description</label>
+									<input type="text" class="form-control" name="addDescription" id="addDescription" />
+								</div>
+							</form>
+						</div>
+					</div>
+
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" data-dismiss="modal" id="addCoursesSubmit">Submit</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal -->
+		</div>
+
+		<div class="modal fade" id="adminGetCourseModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+		 aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">
+							&times;
+						</button>
+						<h4 class="modal-title" id="adminGetCourseLable">
+							Get all courses
+						</h4>
+					</div>
+					<div class="modal-body">
+
+						<table class="table table-striped ">
+							<tr>
+								<th>Course ID</th>
+								<th>Description</th>
+							</tr>
+							<tbody id="allCourseTable_adm" style="display: none;">
+								<tr>
+									<td></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal -->
+		</div>
+
+		<div class="modal fade" id="adminChangePasswordModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+		 aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">
+							&times;
+						</button>
+						<h4 class="modal-title" id="adminChangePasswordLable">
+							Change Password
+						</h4>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+							<form class="form-group" name="adminChangePasswordForm">
+
+								<div class="form-group">
+									<label for="oldPassword">Old password</label>
+									<input type="password" class="form-control" name="oldPassword" id="oldPassword" />
+								</div>
+
+								<div class="form-group">
+									<label for="newPassword">New password</label>
+									<input type="password" class="form-control" name="newPassword" id="newPassword" />
+								</div>
+							</form>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" data-dismiss="modal" id="adminChangePasswordSubmit">Submit</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal -->
+		</div>
+	</body>
+	<script>
+		jQuery(document).ready(function() {
+			$.ajaxSetup({
+				async: false,
+				xhrFields: {
+					withCredentials: true
+				},
+				contentType: "application/x-www-form-urlencoded",
+			});
+			//get course submit logic
+			$("#adminGetCourseBtn").on("click", function() {
+				$.ajax({
+					type: "POST",
+					contentType: "application/x-www-form-urlencoded",
+					url: "http://193.112.53.42:8090/course/getallcourse",
+					data: {},
+					xhrFields: {
+						withCredentials: true
+					},
+					async: false,
+					success: function(data) {
+						if (data.status == "success") {
+							// insert data
+							var allCourseTable_adm = document.getElementById("allCourseTable_adm");
+							allCourseTable_adm.innerHTML = "<tr></tr>";
+							var rowCount = allCourseTable_adm.rows.length;
+							var colCount = allCourseTable_adm.rows[0].cells.length;
+							allCourseTable_adm.style.display = ""; //	display	the	tbody
+							var courseList = data.data;
+							for (var i = 0; i < courseList.length; i++) {
+								let newRow = allCourseTable_adm.insertRow(rowCount++);
+								newRow.insertCell(0).innerHTML = courseList[i].cid;
+								newRow.insertCell(1).innerHTML = courseList[i].description;
+							}
+						} else {
+							alert("fail"+data.data.errCode+": "+data.data.errMsg);
+						}
+					},
+					error: function(data) {
+						alert("server error");
+						return false;
+					}
+				});
+			});
+			//change password submit logic
+			$("#adminChangePasswordSubmit").on("click", function() {
+				$.post("http://193.112.53.42:8090/user/cgpass", {
+						"oldpassword": $("#oldPassword").val(),
+						"newpassword": $("#newPassword").val(),
+					},
+					function(data) {
+						if (data.status == "success") {
+							alert("success");
+
+						} else {
+							alert("fail"+data.data.errCode+": "+data.data.errMsg);
+						}
+					});
+			});
+			//add course submit logic
+			$("#addCoursesSubmit").on("click", function() {
+				var addCid = $("#addCid").val();
+				var addDescription = $("#addDescription").val();
+				$.post("http://193.112.53.42:8090/course/addcourse", {
+					"cid" : addCid,
+					"description" : addDescription,
+				},
+					function(data) {
+						if (data.status == "success") {
+							alert("success");
+
+						} else {
+							alert("fail"+data.data.errCode+": "+data.data.errMsg);
+						}
+					});
+			});
+			//add user submit logic
+			$("#addUserSubmit").on("click", function() {
+				var role = $("#role option:selected").val();
+				var gender = $("#gender option:selected").val();
+				var sid = $("#sid").val();
+				var name = $("#name").val();
+				var password = $("#password").val();
+				var phonenumber = $("#phonenumber").val();
+				$.post("http://193.112.53.42:8090/user/adduser", {
+						"sid": sid,
+						"name": name,
+						"password": password,
+						"phonenumber": phonenumber,
+						"role": role,
+						"gender": gender,
+					},
+					function(data) {
+						if (data.status == "success") {
+							alert("success");
+
+						} else {
+							alert("fail"+data.data.errCode+": "+data.data.errMsg);
+						}
+					});
+			});
+
+			$("#admLogout").on("click", function() {
+				$.ajax({
+					type: "POST",
+					contentType: "application/x-www-form-urlencoded",
+					url: "http://193.112.53.42:8090/user/logout",
+					data: {},
+					xhrFields: {
+						withCredentials: true
+					},
+					async: false,
+					success: function(data) {
+						if (data.status == "success") {
+							window.location.href = "login.html";
+						} else {
+							alert("fail"+data.data.errCode+": "+data.data.errMsg);
+						}
+						return false;
+					},
+					error: function(data) {
+						alert("server error");
+						return false;
+					}
+				});
+				return false;
+			});
+		});
+	</script>
+</html>

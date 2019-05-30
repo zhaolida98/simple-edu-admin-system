@@ -5,6 +5,9 @@ import com.EduAdminSysProject.dataobject.UserDO;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,20 +17,16 @@ import javax.annotation.Resource;
  * Hello world!
  */
 @SpringBootApplication(scanBasePackages = {"com.EduAdminSysProject"})
-@RestController
+@Controller
 @MapperScan("com.EduAdminSysProject.dao")
+@CrossOrigin(origins = {"*"}, allowCredentials = "true")
 public class App {
 
     @Resource
     private UserDOMapper userDOMapper;
-    @RequestMapping("/")
+    @GetMapping("/index")
     public String home() {
-        UserDO userDo = userDOMapper.selectByPrimaryKey("11611803", "1");
-        if (userDo == null) {
-            return "用户对象不存在";
-        } else {
-            return "找到该对象";
-        }
+        return "login";
     }
     public static void main(String[] args) {
         System.out.println("Hello World!");
